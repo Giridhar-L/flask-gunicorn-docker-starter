@@ -1,0 +1,23 @@
+version: "2"
+services:
+  server:
+    build:
+      context: ./
+    image: flask-starter
+    # command: python server.py
+    restart: always
+    container_name: flask-starter
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - PYTHON_ENV=production
+    env_file:
+      - .env
+
+
+
+
+      
