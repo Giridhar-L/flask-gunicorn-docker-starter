@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-import logging
+import logging, json
+from pprint import pformat
 from app.config import Config
 
 cors=CORS()
@@ -10,11 +11,23 @@ def create_app():
     # set logger
     logger = logging.getLogger('gunicorn.error')
     logger.setLevel(logging.INFO)
+    loggingStreamHandler = logging.StreamHandler()
+    # to save to file
+    # loggingStreamHandler = logging.FileHandler("test.json",mode='a')
+    class JSONFormatter(logging.Formatter):
+        def __init__(self):
+            super().__init__()
+        def format(self, record):
+            # record.msg = json.dumps(record.msg)
+            # return super().format(record)
+            return pformat(record.msg)
+    loggingStreamHandler.setFormatter(JSONFormatter())
+    logger.addHandler(loggingStreamHandler)
     app.logger = logger
 
-    # Printing test env vars
-    app.logger.info(Config.TEST_ENV_VAR1)
-    app.logger.info(Config.TEST_ENV_VAR2)
+    # Loading environment vars
+    app.config.from_object(Config)
+    app.logger.info(app.config)
 
     # init cors
     cors.init_app(app)
